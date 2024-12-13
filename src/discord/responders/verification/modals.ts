@@ -1,15 +1,16 @@
 import { Responder, ResponderType, URLStore } from "#base";
-import { res, verificationGenerateCode } from "#functions";
+import { res, sendEmailCode, verificationGenerateCode } from "#functions";
 import { menus } from "#menus";
 import { brBuilder } from "@magicyan/discord";
-import { Resend } from "resend";
 import { z } from "zod";
 
 const verificationSchema = z.object({
   email: z.string().email("Desculpe, o email está inválido"),
 });
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+type EmailUrlStore = {
+  code: string;
+};
 
 new Responder({
   customId: "verification/start",
@@ -36,12 +37,7 @@ new Responder({
 
     const code = verificationGenerateCode();
 
-    const { error } = await resend.emails.send({
-      from: `${guild.name} <${guild.name}@resend.dev>`,
-      to: [email],
-      subject: `Olá, seu código de verificação é ${code}`,
-      html: `<h1>${code}</h1>`,
-    });
+    const { error } = await sendEmailCode(email, code, guild);
 
     if (error) {
       await interaction.editReply(
@@ -52,7 +48,7 @@ new Responder({
       return;
     }
 
-    const urlStore = new URLStore<{ code: string }>();
+    const urlStore = new URLStore<EmailUrlStore>();
     urlStore.set("code", code);
 
     await interaction.editReply(menus.verification.panel(urlStore));

@@ -4,7 +4,11 @@ import { settings } from "#settings";
 import { createEmbed, createRow } from "@magicyan/discord";
 import { InteractionReplyOptions, StringSelectMenuBuilder } from "discord.js";
 
-export function verificationPanelMenu(url: URLStore<{ code: string }>) {
+type EmailUrlStore = {
+  code: string;
+};
+
+export function verificationPanelMenu(url: URLStore<EmailUrlStore>) {
   const embed = createEmbed({
     url,
     description: "Por favor, selecine o código no menu abaixo",

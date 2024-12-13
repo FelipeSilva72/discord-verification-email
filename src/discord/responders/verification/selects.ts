@@ -6,6 +6,10 @@ import { createEmbed, findChannel, findRole } from "@magicyan/discord";
 const verificationRoleId = settings.verification.roleId;
 const verificationChannelLogsId = settings.verification.logsId;
 
+type EmailUrlStore = {
+  code: string;
+};
+
 new Responder({
   customId: "verification/code",
   type: ResponderType.StringSelect,
@@ -16,7 +20,7 @@ new Responder({
     const { values, guild, member } = interaction;
 
     const embed = createEmbed({ from: interaction });
-    const urlStore = new URLStore<{ code: string }>(embed.data.url);
+    const urlStore = new URLStore<EmailUrlStore>(embed.data.url);
 
     const [code] = values;
     const realCode = urlStore.get("code") as string;
